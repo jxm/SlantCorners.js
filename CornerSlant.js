@@ -4,18 +4,20 @@ CutCornerBG class
 methods
 */
 
-class CutCornerBG
+class CornerSlant
 {
     //let element
     //let canvas
     
     constructor(e) {
+        
         this.element = e;
         
         this.canvas = document.createElement("canvas");
         
         this.canvas.width = e.offsetWidth;
         this.canvas.height = e.offsetHeight;
+        
     }
     
     cutPoint(corner, point, size) {
@@ -233,5 +235,55 @@ class CutCornerBG
         this.element.style.background = "url("+img+") no-repeat";
         
     }
+    
+    //p = points, d = round distance
+    drawRound(p, d) {
+        let ctx = this.canvas.getContext("2d");
+        
+        for (let i=0; i<p.length; i++) {
+            
+            if (d <=0) {
+                if (i==0) {
+                    ctx.moveTo(p[0][0], p[0][1]);
+                } else {
+                    ctx.lineTo(p[i][0], p[i][1]);
+                }
+                continue;   
+            }
+            
+            let prev = i-1;
+            if (i == 0) { prev = p.length-1 }
+            let next = i+1;
+            if (i >= p.length-1) { next = 0 }
+            
+            
+            console.log("pprev: "+"("+p[prev][0]+","+p[prev][1]+") pi: "+"("+p[i][0]+","+p[i][1]+") pnext: "+"("+p[next][0]+","+p[next][1]+")");
+            
+            let angle1 = Math.atan2( p[prev][1]-p[i][1], p[prev][0]-p[i][0] );
+            let angle2 = Math.atan2( p[next][1]-p[i][1], p[next][0]-p[i][0] );
+            
+            let p1 = [];
+            let p2 = [];
+            p1[0] = p[i][0] + Math.cos(angle1)*d;
+            p1[1] = p[i][1] + Math.sin(angle1)*d;
+            p2[0] = p[i][0] + Math.cos(angle2)*d;
+            p2[1] = p[i][1] + Math.sin(angle2)*d;
+            
+            console.log("p1: "+"("+p1[0]+","+p1[1]+")");
+            
+            
+            if (i==0) {
+                ctx.moveTo(p1[0], p1[1]);
+            } else {
+                ctx.lineTo(p1[0], p1[1]);
+            }
+            ctx.quadraticCurveTo(p[i][0], p[i][1], p2[0], p2[1]);
+            
+        }
+        
+        ctx.closePath();
+        
+    }
+    
     
 }
