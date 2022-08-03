@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
 function init() {
     
     let box1 = document.getElementById("box1");
-    let cc = new CornerSlant(box1);
+    let cc = new SlantCorner(box1);
     
     /**
     cc.fill("orange", [16, 0, 32, 0]);

@@ -4,7 +4,7 @@ CutCornerBG class
 methods
 */
 
-class CornerSlant
+class SlantCorner
 {
     //let element
     //let canvas
