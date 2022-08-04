@@ -1,7 +1,5 @@
 /*
 CutCornerBG class
-
-methods
 */
 
 class SlantCorners
