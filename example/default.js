@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
 function init() {
 
-    //variables
     let bg_color = "#b0b0b0";
     let outline_color = "#000099";
     let outline_size = 5; //px
