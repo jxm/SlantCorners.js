@@ -7,31 +7,33 @@ document.addEventListener("DOMContentLoaded", ()=>{
 });
 
 function init() {
-    
-    let box1 = document.getElementById("box1");
-    let cc = new SlantCorner(box1);
-    
-    /**
-    cc.fill("orange", [16, 0, 32, 0]);
-    cc.outline("black", 3, [16, 0, 32, 0]);
-    cc.replaceBackground();
-    **/
-    
-    let op = cc.outerPoints([0, 16, 16, 32]);
-    let ip = cc.innerPoints(op, 5);
-    
-    let ctx = cc.canvas.getContext("2d");
-    ctx.beginPath();
-    cc.drawRound(op, 4);
-    cc.drawRound(ip, 2);
-    ctx.clip("evenodd");
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, cc.canvas.width, cc.canvas.height);
 
+    //variables
+    let bg_color = "#b0b0b0";
+    let outline_color = "#000099";
+    let outline_size = 5; //px
+    let corners = [0, 16, 0, 16];
+
+    let slant_bg = document.getElementsByClassName("slant-corner-bg");
+    let slant_outline = document.getElementsByClassName("slant-corner-outline");
+    let slant_bgoutline = document.getElementsByClassName("slanted-corner-bg-outline");
+
+    for (let i=0; i<slant_bg.length; i++) {
+        let elem = slant_bg[i];
+        let cs = new SlantCorners(elem);
+        cs.fill(corners, bg_color);
+    }
+
+    for (let i=0; i<slant_outline.length; i++) {
+        let elem = slant_outline[i];
+        let cs = new SlantCorners(elem);
+        cs.outline(corners, outline_size, outline_color);
+    }
     
-    //let ip = ccex3.innerPoints(ex3op, 5);
-    //let exip2 = ccex3.innerPoints(ex3op, 8);
-    //ccex3.drawOutline(exip1, exip2, "#333");
-    cc.replaceBackground();
+    for (let i=0; i<slant_bgoutline.length; i++) {
+        let elem = slant_bgoutline[i];
+        let cs = new SlantCorners(elem);
+        cs.fillOutline(corners, outline_size, bg_color, outline_color);
+    }
     
 }

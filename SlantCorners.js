@@ -4,21 +4,114 @@ CutCornerBG class
 methods
 */
 
-class SlantCorner
+class SlantCorners
 {
-    //let element
-    //let canvas
     
     constructor(e) {
         
         this.element = e;
         
         this.canvas = document.createElement("canvas");
-        
         this.canvas.width = e.offsetWidth;
         this.canvas.height = e.offsetHeight;
         
+        this.default_curve_factor = 4;
     }
+    
+    fill(corners, color) {
+        
+        this.drawFill(corners, color);
+        this.replaceBackground();
+        
+    }
+    
+    fillOutline(corners, width, bg_color, outline_color) {
+        
+        this.drawFill(corners, bg_color);
+        this.drawOutline(corners, width, outline_color);
+        this.replaceBackground();
+        
+    }
+    
+    outline(corners, width, color) {
+        
+        this.drawOutline(corners, width, color);
+        this.replaceBackground();
+        
+    }
+    
+    drawFill(corners, color) {
+        
+        let ctx = this.canvas.getContext("2d");
+        
+        let op = this.outerPoints(corners);
+        
+        ctx.beginPath();
+        this.drawFilter(op, this.default_curve_factor);
+        ctx.fillStyle = color;
+        ctx.fill();
+        
+    }
+    
+    drawFilter(p, d) {
+        let ctx = this.canvas.getContext("2d");
+        
+        for (let i=0; i<p.length; i++) {
+            
+            if (d <=0) {
+                if (i==0) {
+                    ctx.moveTo(p[0][0], p[0][1]);
+                } else {
+                    ctx.lineTo(p[i][0], p[i][1]);
+                }
+                continue;   
+            }
+            
+            let prev = i-1;
+            if (i == 0) { prev = p.length-1 }
+            let next = i+1;
+            if (i >= p.length-1) { next = 0 }
+            
+            let angle1 = Math.atan2( p[prev][1]-p[i][1], p[prev][0]-p[i][0] );
+            let angle2 = Math.atan2( p[next][1]-p[i][1], p[next][0]-p[i][0] );
+            
+            let p1 = [];
+            let p2 = [];
+            p1[0] = p[i][0] + Math.cos(angle1)*d;
+            p1[1] = p[i][1] + Math.sin(angle1)*d;
+            p2[0] = p[i][0] + Math.cos(angle2)*d;
+            p2[1] = p[i][1] + Math.sin(angle2)*d;
+            
+            if (i==0) {
+                ctx.moveTo(p1[0], p1[1]);
+            } else {
+                ctx.lineTo(p1[0], p1[1]);
+            }
+            ctx.quadraticCurveTo(p[i][0], p[i][1], p2[0], p2[1]);
+            
+        }
+        
+        ctx.closePath();
+        
+    }
+    
+    drawOutline(corners, width, color) {
+        
+        let ctx = this.canvas.getContext("2d");
+        
+        let op = this.outerPoints(corners);
+        let ip = this.innerPoints(op, width);
+        
+        ctx.beginPath();
+        this.drawFilter(op, this.default_curve_factor);
+        this.drawFilter(ip, this.default_curve_factor);
+        ctx.clip("evenodd");
+        ctx.fillStyle = color;
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+    }
+    
+    
     
     cutPoint(corner, point, size) {
         if (!size) {
@@ -60,44 +153,6 @@ class SlantCorner
         return [start, end];
     }
     
-    drawOutline(op, ip, color) {
-        let ctx = this.canvas.getContext("2d");
-        
-        ctx.beginPath();
-        ctx.moveTo(op[0][0], op[0][1]);
-        for (var i=1; i<op.length; i++) {
-            ctx.lineTo(op[i][0], op[i][1]);
-        }
-        ctx.closePath();
-        ctx.moveTo(ip[0][0], ip[0][1]);
-        for (var i=1; i<ip.length; i++) {
-            ctx.lineTo(ip[i][0], ip[i][1]);
-        }
-        ctx.closePath();
-        ctx.clip("evenodd");
-        ctx.fillStyle = color;
-        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    }
-    
-    fill(color, sizes) {
-        
-        let op = this.outerPoints(sizes);
-        
-        //given op
-        let ctx = this.canvas.getContext("2d");
-        
-        //draw
-        ctx.beginPath();
-        ctx.moveTo(op[0][0], op[0][1]);
-        for (var i=1; i<op.length; i++) {
-            ctx.lineTo(op[i][0], op[i][1]);
-        }
-        ctx.closePath();
-        ctx.fillStyle = color;
-        ctx.fill();
-        
-    }
-    
     getSlope(x1, y1, x2, y2) {
         if (x1 == x2) {
             return "undefined";
@@ -117,7 +172,7 @@ class SlantCorner
     }
     
     innerPoints(op, stroke) {
-        //get center of box
+        
         let center = [this.canvas.width/2, this.canvas.height/2];
         let ip = [];
         
@@ -173,7 +228,6 @@ class SlantCorner
                 inner_p[1] = m1*(inner_p[0]-p1[0])+p1[1];
             }
             ip.push(inner_p);
-            //ip.push(p);
         }
         return ip;
     }
@@ -203,87 +257,18 @@ class SlantCorner
         return points;
     }
     
-    outline(color, stroke, options) {
-        
-        let op = this.outerPoints(options);
-        let ip = this.innerPoints(op, stroke);
-        
-        let ctx = this.canvas.getContext("2d");
-        
-        ctx.beginPath();
-        ctx.moveTo(op[0][0], op[0][1]);
-        for (var i=1; i<op.length; i++) {
-            ctx.lineTo(op[i][0], op[i][1]);
-        }
-        ctx.closePath();
-        ctx.moveTo(ip[0][0], ip[0][1]);
-        for (var i=1; i<ip.length; i++) {
-            ctx.lineTo(ip[i][0], ip[i][1]);
-        }
-        ctx.closePath();
-        ctx.clip("evenodd");
-        ctx.fillStyle = color;
-        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
-    }
-    
     replaceBackground() {
         
         //get image data
         let img = this.canvas.toDataURL();
         //set as background
         this.element.style.background = "url("+img+") no-repeat";
+        this.element.style.backgroundSize = "100% 100%";
         
     }
     
-    //p = points, d = round distance
-    drawRound(p, d) {
-        let ctx = this.canvas.getContext("2d");
-        
-        for (let i=0; i<p.length; i++) {
-            
-            if (d <=0) {
-                if (i==0) {
-                    ctx.moveTo(p[0][0], p[0][1]);
-                } else {
-                    ctx.lineTo(p[i][0], p[i][1]);
-                }
-                continue;   
-            }
-            
-            let prev = i-1;
-            if (i == 0) { prev = p.length-1 }
-            let next = i+1;
-            if (i >= p.length-1) { next = 0 }
-            
-            
-            console.log("pprev: "+"("+p[prev][0]+","+p[prev][1]+") pi: "+"("+p[i][0]+","+p[i][1]+") pnext: "+"("+p[next][0]+","+p[next][1]+")");
-            
-            let angle1 = Math.atan2( p[prev][1]-p[i][1], p[prev][0]-p[i][0] );
-            let angle2 = Math.atan2( p[next][1]-p[i][1], p[next][0]-p[i][0] );
-            
-            let p1 = [];
-            let p2 = [];
-            p1[0] = p[i][0] + Math.cos(angle1)*d;
-            p1[1] = p[i][1] + Math.sin(angle1)*d;
-            p2[0] = p[i][0] + Math.cos(angle2)*d;
-            p2[1] = p[i][1] + Math.sin(angle2)*d;
-            
-            console.log("p1: "+"("+p1[0]+","+p1[1]+")");
-            
-            
-            if (i==0) {
-                ctx.moveTo(p1[0], p1[1]);
-            } else {
-                ctx.lineTo(p1[0], p1[1]);
-            }
-            ctx.quadraticCurveTo(p[i][0], p[i][1], p2[0], p2[1]);
-            
-        }
-        
-        ctx.closePath();
-        
-    }
+    //draws line with rounded points
+    
     
     
 }

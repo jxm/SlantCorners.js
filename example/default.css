@@ -10,15 +10,29 @@ body, html {
 body {
     font-family: Lato, Sans-serif;
 }
-.container {
-    margin: 0 auto;
+.row {
+    margin: 0;
     width: 100%;
+    display: flex;
     padding: 2rem;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+}
+.row > div {
+    width: 100%;
+    height: 20rem;
+    margin: 16px;
+    flex-grow: 1;
+    padding: 32px;
+    background: red;
 }
 
-#box1 {
-    display: block;
-    width: 300px;
-    height: 300px;
-    padding: 1rem;
+@media only screen and (min-width: 600px) {
+    .row {
+        
+    }
+    .row > div {
+        width: auto;
+    }
 }
+
