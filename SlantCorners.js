@@ -1,7 +1,3 @@
-/*
-CutCornerBG class
-*/
-
 class SlantCorners
 {
     
